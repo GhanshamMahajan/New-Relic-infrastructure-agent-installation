@@ -7,7 +7,7 @@
   - name: install config file
     ansible.builtin.lineinfile:
       path: /etc/newrelic-infra.yml
-      line: 'license_key: c7b92asdfnlxvasdfsadfkjlsdf8sd6f8asdf89sd7'
+      line: 'license_key: YOUR_LICENSE_KEY'
       create: yes
   
   - name: Add NewRelic repository
