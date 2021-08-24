@@ -1,0 +1,49 @@
+---
+- name: Agent Server
+  hosts: all
+  remote_user: root
+
+  tasks:
+  - name: install config file
+    ansible.builtin.lineinfile:
+      path: /etc/newrelic-infra.yml
+      line: 'license_key: c7b92asdfnlxvasdfsadfkjlsdf8sd6f8asdf89sd7'
+      create: yes
+  
+  - name: Add NewRelic repository
+    get_url:
+      url: https://download.newrelic.com/infrastructure_agent/linux/yum/el/7/x86_64/newrelic-infra.repo
+      dest: /etc/yum.repos.d/newrelic-infra.repo
+      mode: '0644'
+	  
+  - name: Install a nerelic-infra and nri-oracledb package
+    yum:
+      name:
+        - newrelic-infra
+        - nri-oracledb
+      state: present
+	  
+  - name: Start service newrelic-infra, if not started
+    ansible.builtin.service:
+      name: newrelic-infra
+      state: started
+	  
+  - name: Change file ownership, group and permissions
+    ansible.builtin.file:
+      path: /etc/newrelic-infra/integrations.d/docker-config.yml
+      owner: root
+      group: root
+      mode: '0777'
+	  
+  - name: Copy file with owner and permissions
+    ansible.builtin.copy:
+      src: /etc/newrelic-infra/integrations.d/oracledb-config.yml.sample
+      dest: /etc/newrelic-infra/integrations.d/oracledb-config.yml
+      owner: root
+      group: root
+      mode: '0777'
+
+  - name: Restart service newrelic-infra, in all cases
+    ansible.builtin.service:
+      name: newrelic-infra
+      state: restarted
